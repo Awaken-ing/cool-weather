@@ -1,7 +1,10 @@
 package com.zsy.forms.coolo.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.gson.Gson;
+import com.zsy.forms.coolo.base.Weather;
 import com.zsy.forms.coolo.database.City;
 import com.zsy.forms.coolo.database.County;
 import com.zsy.forms.coolo.database.Province;
@@ -15,6 +18,20 @@ import org.json.JSONObject;
  */
 
 public class jsonUtil {
+
+    public static Weather handlerWeatherResponse(String response){
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent,Weather.class);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
 
     public static boolean handleProvinceResponse(String response) {
         if (!TextUtils.isEmpty(response)) {
@@ -58,12 +75,13 @@ public class jsonUtil {
     public static boolean handleCountyResponse(String response, int CountyId) {
         if (!TextUtils.isEmpty(response)) {
             try {
+                Log.e("89","得到的数据"+response);
                 JSONArray countyJson = new JSONArray(response);
                 for (int i = 0, j = countyJson.length(); i < j; i++) {
                     JSONObject countyObject = countyJson.getJSONObject(i);
                     County county = new County();
                     county.setCountyName(countyObject.getString("name"));
-                    county.setWeatherCode("weather_id");
+                    county.setWeatherId(countyObject.getString("weather_id"));
                     county.setCityId(CountyId);
                     county.save();
                 }

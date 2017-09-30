@@ -1,6 +1,7 @@
 package com.zsy.forms.coolo.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zsy.forms.coolo.R;
+import com.zsy.forms.coolo.activity.WeatherActivity;
 import com.zsy.forms.coolo.database.City;
 import com.zsy.forms.coolo.database.County;
 import com.zsy.forms.coolo.database.Province;
@@ -77,6 +79,13 @@ public class ChooseFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectCity = cityList.get(position);
                     queryCounties();
+                }else if(currentLevel == LEVEL_COUNTY){
+                    String weatherID = countyList.get(position).getWeatherId();
+                    Log.e("dc","天气编码"+weatherID);
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherID);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
