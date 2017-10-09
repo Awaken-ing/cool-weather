@@ -28,7 +28,8 @@
     </RelativeLayout>
 
     <ListView
+        android:background="@color/colorWhite"
         android:id="@+id/lvArea"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 </LinearLayout>

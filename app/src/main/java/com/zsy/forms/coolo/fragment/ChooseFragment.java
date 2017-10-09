@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zsy.forms.coolo.R;
+import com.zsy.forms.coolo.activity.MainActivity;
 import com.zsy.forms.coolo.activity.WeatherActivity;
 import com.zsy.forms.coolo.database.City;
 import com.zsy.forms.coolo.database.County;
@@ -56,7 +57,7 @@ public class ChooseFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_choose_area, container, false);
         tvTitle = (TextView) view.findViewById(R.id.tvTitle);
         btnBack = (Button) view.findViewById(R.id.btnTitleBack);
@@ -79,13 +80,20 @@ public class ChooseFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectCity = cityList.get(position);
                     queryCounties();
-                }else if(currentLevel == LEVEL_COUNTY){
+                } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherID = countyList.get(position).getWeatherId();
-                    Log.e("dc","天气编码"+weatherID);
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherID);
-                    startActivity(intent);
-                    getActivity().finish();
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherID);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity){
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.drawLayout.closeDrawers();
+                        activity.swipLayout.setRefreshing(true);
+                        activity.requestWeather(weatherID);
+                    }
+
                 }
             }
         });
@@ -155,7 +163,7 @@ public class ChooseFragment extends Fragment {
         } else {
             int provinceCode = selectProvince.getProvinceCode();
             int cityCode = selectCity.getCityCode();
-            String address = "http://guolin.tech/api/china/"+ provinceCode + "/" +cityCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
         }
     }
@@ -177,7 +185,7 @@ public class ChooseFragment extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
-                Log.e("M",responseBody);
+                Log.e("M", responseBody);
                 boolean result = false;
                 if ("province".equals(type)) {
                     result = jsonUtil.handleProvinceResponse(responseBody);
